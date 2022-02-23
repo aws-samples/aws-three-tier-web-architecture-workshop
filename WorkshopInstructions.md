@@ -1,16 +1,4 @@
-# AWS Three Tier Web Application Architecture
-
-## Lab Description: This lab is a hands-on walk through of a three-tier web architecture in AWS. We will be creating the necessary network, security, app, and database components and configurations in order to run this architecture in an available and scalable manner.
-
-## Pre-requisites:
-1. An AWS account. If you don’t have an AWS account, follow the instructions here and
-click on “Create an AWS Account” button in the top right corner to create one.
-1. IDE or text editor of your choice.
-
-## Architecture Overview
-[insert architecture diagram]
-
-In this architecture, a public-facing Application Load Balancer forwards client traffic to our web tier EC2 instances. The web tier is running Nginx webservers that are configured to serve a React.js website and redirects our API calls to the application tier’s internal facing load balancer. The internal facing load balancer then forwards that traffic to the application tier, which is written in Node.js. The application tier manipulates data in an Aurora MySQL multi-AZ database and returns it to our web tier. Load balancing, health checks and autoscaling groups are created at each layer to maintain the availability of this architecture.
+# Workshop Instructions
 
 ## PART 0: SETUP
 LEARNING OBJECTIVES:
@@ -19,10 +7,11 @@ LEARNING OBJECTIVES:
 * Download Code from Git Repo
 
 #### INSTRUCTIONS:
-1. Download the code from the Git repo: [insert URL when available]
+1. Download the code from this repository.
 
 1. S3 Bucket Creation
     1. Navigate to the S3 service in the AWS console and create a new S3 bucket. You can also reuse any bucket, but make sure it is in the same region that you intend to use for this whole lab. This is where we will upload our code later.
+    
 1. IAM EC2 Instance Role Creation
     1. Navigate to the IAM dashboard in the AWS console
     1. Create an EC2 role with the following AWS managed policies. These policieswill allow our instances to download our code from S3 and use Systems Manager Session Manager to securely connect to our instances without SSH keys through the AWS console.
