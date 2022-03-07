@@ -33,17 +33,17 @@ LEARNING OBJECTIVES:
     1. Navigate to the VPC dashboard in the AWS console.
     1. Create a new VPC and fill out the VPC Settings with a Name tag and a CIDR range of your choice.
 
-    _NOTE: Make sure you pay attention to the region you’re deploying all your resources in. You’ll want to stay consistent for this lab._
+        _NOTE: Make sure you pay attention to the region you’re deploying all your resources in. You’ll want to stay consistent for this lab._
 
-    _NOTE: Choose a CIDR range that will allow you to create at least 6 subnets._
+        _NOTE: Choose a CIDR range that will allow you to create at least 6 subnets._
 
 1. Subnet Creation
     1. Next, create your subnets by navigating to **Subnets** on the left side of the dashboard.
     1. We will need **six** subnets across **two** availability zones. That means that **three** subnets will be in one availability zone, and three subnets will be in another zone. Each subnet in one availability zone will correspond to one layer of our three tier architecture. Create each of the 6 subnets by specifying the VPC we created in part 1 and then choose a name, availability zone, and appropriate CIDR range for each of the subnets.
 
-    _NOTE: It may be helpful to have a naming convention that will help you remember what each subnet is for. For example in one AZ you might have the following: **Public-Web-Subnet-AZ-1, Private-App-Subnet-AZ-1, Private-DB-Subnet-AZ-1**_.
+        _NOTE: It may be helpful to have a naming convention that will help you remember what each subnet is for. For example in one AZ you might have the following: **Public-Web-Subnet-AZ-1, Private-App-Subnet-AZ-1, Private-DB-Subnet-AZ-1**_.
 
-    _NOTE: Remember, your CIDR range for the subnets will be subsets of your VPC CIDR range._
+        _NOTE: Remember, your CIDR range for the subnets will be subsets of your VPC CIDR range._
 
 
 1. Internet Gateway
@@ -99,85 +99,97 @@ LEARNING OBJECTIVES:
 1. Connect to App Layer Instance
     1. Navigate to your list of running Ec2 Instances. When the instance state is running, connect to your instance by clicking the checkmark box to the left of the instance, and click the connect button on the top right corner of the dashboard.Select the Session Manager tab, and click connect.
 
-    _NOTE: If you get a message saying that you cannot connect via session manager, then check that your instances can route to your NAT gateways and verify that you gave the necessary permissions on the IAM role for the Ec2 instance._
+        _NOTE: If you get a message saying that you cannot connect via session manager, then check that your instances can route to your NAT gateways and verify that you gave the necessary permissions on the IAM role for the Ec2 instance._
 
     1. When you first connect to your instance like this, you will be logged in as ssm- user. For simplicity, let’s switch to ec2-user by executing the following command:
 
-    ```
-        sudo -su ec2-user
-    ```
+        ```
+            sudo -su ec2-user
+            
+        ```
 
     1. Let’s take this moment to make sure that we are able to reach the internet via our NAT gateways. If your network is configured correctly up till this point, you should be able to ping the google DNS servers:
 
-    ```    
-        ping 8.8.8.8
-    ```
-    You should see a transmission of packets. Stop it by pressing cntrl c.
+            ```    
+                ping 8.8.8.8
+                
+            ```
+        You should see a transmission of packets. Stop it by pressing cntrl c.
 
-_NOTE: If you can’t reach the internet then you need to double check your route tables and subnet associations to verify if traffic is being routed to your NAT gateway!_
+        _NOTE: If you can’t reach the internet then you need to double check your route tables and subnet associations to verify if traffic is being routed to your NAT gateway!_
 
 1. Test Database Connectivity
     1. Start by downloading the MySQL CLI:
 
-    ```
-        sudo yum install mysql -y
-    ```
+        ```
+            sudo yum install mysql -y
+            
+        ```
 
     1. Initiate your DB connection with your Aurora RDS writer endpoint. In the following command, replace the RDS writer endpoint and the username:
 
-    ```
-        mysql -h CHANGE-TO-YOUR-RDS-ENDPOINT -u CHANGE-TO-USER-NAME -p
-    ```
-    You will then be prompted to type in your password. Once you input the password and hit enter, you should now be connected to your database.
+        ```
+            mysql -h CHANGE-TO-YOUR-RDS-ENDPOINT -u CHANGE-TO-USER-NAME -p
+            
+        ```
 
-    _NOTE: If you cannot reach your database, check your credentials and security groups._
+        You will then be prompted to type in your password. Once you input the password and hit enter, you should now be connected to your database.
+
+        _NOTE: If you cannot reach your database, check your credentials and security groups._
 
 1. Create Data
     1. Create a database called **webappdb** with the following command using the MySQL CLI:
 
-    ```
-        CREATE DATABASE webappdb;
-    ```
+        ```
+            CREATE DATABASE webappdb;
+            
+        ```
 
-    You can verify that it was created correctly with the following command:
+        You can verify that it was created correctly with the following command:
               
-    ```
-        SHOW DATABASES;
-    ```
+        ```
+            SHOW DATABASES;
+
+        ```
 
     1. Create a data table by first navigating to the database we just created:
 
-    ```
-        USE webappdb;
-    ```
+        ```
+            USE webappdb;
+            
+        ```
 
-    Then, create the following **transactions** table by executing this create table command:
+        Then, create the following **transactions** table by executing this create table command:
 
-    ```
-        CREATE TABLE IF NOT EXISTS transactions(id INT NOT NULL
-        AUTO_INCREMENT, amount DECIMAL(10,2), description
-        VARCHAR(100), PRIMARY KEY(id));
-    ```
+        ```
+            CREATE TABLE IF NOT EXISTS transactions(id INT NOT NULL
+            AUTO_INCREMENT, amount DECIMAL(10,2), description
+            VARCHAR(100), PRIMARY KEY(id));
+            
+        ```
 
-    Verify the table was created:
+        Verify the table was created:
 
-    ```
-        SHOW TABLES;
-    ```
+        ```
+            SHOW TABLES;
+            
+        ```
 
     1. Insert data into table for use/testing later:
 
-    ```
-        INSERT INTO transactions (amount,description) VALUES ('400','groceries');
-    ```
+        ```
+            INSERT INTO transactions (amount,description) VALUES ('400','groceries');
+            
+        ```
 
-    Verify that your data was added by executing the following command:
+        Verify that your data was added by executing the following command:
 
-    ```
-        SELECT * FROM transactions;
-    ```
+        ```
+            SELECT * FROM transactions;
+            
+        ```
 
-    When finished, just type **exit** and hit enter to exit the MySQL client.
+        When finished, just type **exit** and hit enter to exit the MySQL client.
 
 1. Configure App Layer Instance
     1. The first thing we will do is update our database credentials for the app tier. To do this, open the **application-code/app-tier/DbConfig.js** file from the github repo in your favorite text editor on your computer. You’ll see empty strings for the hostname, user, password and database. Fill this in with the credentials you configured for your database, the **writer** endpoint of your database as the hostname, and **webappdb** for the database. Save the file.
@@ -188,74 +200,77 @@ _NOTE: If you can’t reach the internet then you need to double check your rout
 
     1. Go back to your SSM session. Now we need to install all of the necessary components to run our backend application. Start by installing NVM (node version manager)
 
-    ```
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-        source ~/.bashrc
+        ```
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+            source ~/.bashrc
 
-    ```
+        ```
 
     1. Next, install Node.js
 
-    ```
-        nvm install node
-    ```
+        ```
+            nvm install node
+
+        ```
 
     1. PM2 is a daemon process manager that will keep our node.js app running.
 
-    ```
-        npm install -g pm2
-    ```
+        ```
+            npm install -g pm2
+            
+        ```
 
     1. Now we need to download our code from our s3 buckets onto our instance. In the command below, replace BUCKET_NAME with the name of the bucket you uploaded the **app-tier** folder to:
 
-    ```
-        cd ~/
-        aws s3 cp s3://BUCKET_NAME/app-tier/ app-tier --recursive
+        ```
+            cd ~/
+            aws s3 cp s3://BUCKET_NAME/app-tier/ app-tier --recursive
 
-    ```
+        ```
 
     1. Navigate to the app directory, install dependencies, and start the app with pm2.
 
-    ```
-        cd ~/app-tier
-        npm install
-        pm2 start index.js
+        ```
+            cd ~/app-tier
+            npm install
+            pm2 start index.js
 
-    ```
+        ```
 
-    To make sure the app is running correctly run the following:
+        To make sure the app is running correctly run the following:
 
-    ```
-        pm2 list
+        ```
+            pm2 list
 
-    ```
-    If you see a status of online, the app is running. If you see errored, then you need to do some troubleshooting. To look at the latest errors, use this command:
+        ```
+        If you see a status of online, the app is running. If you see errored, then you need to do some troubleshooting. To look at the latest errors, use this command:
 
-    ```
-        pm2 logs
+        ```
+            pm2 logs
 
-    ```
+        ```
 
-    NOTE: If you’re having issues, check your configuration file for any typos, and double check that you have followed all installation commands till now.
+        NOTE: If you’re having issues, check your configuration file for any typos, and double check that you have followed all installation commands till now.
 
     1. Right now, pm2 is just making sure our app stays running when we leave the SSM session. However, if the server is interrupted for some reason, we still want the app to start and keep running. This is also important for the AMI we will create:
 
-    ```
-        pm2 startup
-    ```
+        ```
+            pm2 startup
+            
+        ```
 
-    After running this you will see a message similar to this.
+        After running this you will see a message similar to this.
 
-    ```
-        [PM2] To setup the Startup Script, copy/paste the following command: sudo env PATH=$PATH:/home/ec2-user/.nvm/versions/node/v16.0.0/bin /home/ec2-user/.nvm/versions/node/v16.0.0/lib/node_modules/pm2/bin/pm2 startup systemd -u ec2-user —hp /home/ec2-user
-    ```    
+        ```
+            [PM2] To setup the Startup Script, copy/paste the following command: sudo env PATH=$PATH:/home/ec2-user/.nvm/versions/node/v16.0.0/bin /home/ec2-user/.nvm/versions/node/v16.0.0/lib/node_modules/pm2/bin/pm2 startup systemd -u ec2-user —hp /home/ec2-user
+        ```    
 
-    DO NOT run the above command, rather you should copy and past the command in the output you see in your own terminal. After you run it, save the current list of node processes with the following command:
+        **DO NOT run the above command**, rather you should copy and past the command in the output you see in your own terminal. After you run it, save the current list of node processes with the following command:
 
-    ```
-        pm2 save
+        ```
+            pm2 save
 
-    ```
+        ```
 
     1. In order to test that your app tier works, you can temporarily associate this instance’s subnet with the public route table, and then attach an Elastic IP to the instance since it has no public IP associated with it. An Elastic IP is a public IPv4 address that you can associate with your private instance in order to enable internet access.
 
@@ -267,12 +282,12 @@ _NOTE: If you can’t reach the internet then you need to double check your rout
 
     1. Navigate back to your Ec2 instances, select your app tier instance and in the details you’ll see a public IP you can use to test. Take this public IP and replace [YOUR PUBLIC IP] in one of the commands below and enter the URL in your browser:
 
-    ```
-        http://[YOUR PUBLIC IP]:4000/transaction
-    
-    ```
+        ```
+            http://[YOUR PUBLIC IP]:4000/transaction
+        
+        ```
 
-    If you see data from your database, then everything is set up correctly so far.
+        If you see data from your database, then everything is set up correctly so far.
 
     1. Now, reset your route table association so this instance’s private subnet is associated with the correct private route table. **This step is important to do or you may run into issues later**.
 
@@ -339,81 +354,83 @@ INSTRUCTIONS:
 1. Connect to Web Tier Instance
     1. Follow the same steps you used to connect to the app instance and change the user to **ec2-user**. Test connectivity here via ping as well since this instance should have internet connectivity:
 
-    ```    
-    sudo -su ec2-user 
-    ping 8.8.8.8
+        ```    
+        sudo -su ec2-user 
+        ping 8.8.8.8
 
-    ```
+        ```
 
 1. Configure Web Tier Instance
     1. We now need to install all of the necessary components needed to run our front-end application. Again, start by installing NVM and node :
 
-    ```
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-    source ~/.bashrc
-    nvm install node
+        ```
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+        source ~/.bashrc
+        nvm install node
 
-    ```
+        ```
+
     1. Now we need to download our web tier code from our s3 bucket:
     
-    ```
-        cd ~/
-        aws s3 cp s3://BUCKET_NAME/web-tier/ web-tier --recursive
+        ```
+            cd ~/
+            aws s3 cp s3://BUCKET_NAME/web-tier/ web-tier --recursive
 
-    ```
+        ```
 
-    Navigate to the web-layer folder and create the build folder for the react app so we can serve our code:
+        Navigate to the web-layer folder and create the build folder for the react app so we can serve our code:
 
-    ```
-    cd ~/web-tier
-    npm install 
-    npm run build
+        ```
+        cd ~/web-tier
+        npm install 
+        npm run build
 
-    ```
+        ```
 
     1. Nginx can do all sorts of things like load balancing, content caching etc, but we will be using it as a web server that we will configure to serve our application on port 80, as well as help direct our API calls to the internal load balancer.
 
-    ```
-        sudo amazon-linux-extras install nginx1 -y
+        ```
+            sudo amazon-linux-extras install nginx1 -y
 
-    ```
+        ```
 
     1. We will now have to configure Nginx. Navigate to the Nginx configuration file with the following commands:
 
-    ```
-        cd /etc/nginx
-        ls
+        ```
+            cd /etc/nginx
+            ls
 
-    ```
+        ```
 
-    You should see an nginx.conf file. We’re going to delete this file and use the one we uploaded to s3. Replace the bucket name in the command below with the one you created for this workshop:
+        You should see an nginx.conf file. We’re going to delete this file and use the one we uploaded to s3. Replace the bucket name in the command below with the one you created for this workshop:
 
-    ```
-    sudo rm nginx.conf
-    sudo aws s3 cp s3://BUCKET_NAME/nginx.conf .
+        ```
+        sudo rm nginx.conf
+        sudo aws s3 cp s3://BUCKET_NAME/nginx.conf .
 
-    ```
+        ```
 
-    Then, restart Nginx with the following command:
-    
-    ```
-    sudo service nginx restart
+        Then, restart Nginx with the following command:
+        
+        ```
+        sudo service nginx restart
 
-    ```
+        ```
 
-    To make sure Nginx has permission to access our files execute this command:
+        To make sure Nginx has permission to access our files execute this command:
 
-    ```
-    chmod -R 755 /home/ec2-user
+        ```
+        chmod -R 755 /home/ec2-user
 
-    ```
+        ```
 
-    And then to make sure the service starts on boot, run this command:
+        And then to make sure the service starts on boot, run this command:
 
-    ```
-    sudo chkconfig nginx on
+        ```
+        sudo chkconfig nginx on
 
-    ```
+        ```
+        
     1. Now when you plug in the public IP of your web tier instance, you should see your website. If you have the database connected and working correctly, then you will also see the database working. You’ll be able to add data. Careful with the delete button, that will clear all the entries in your database.
 
 ## PART 6: EXTERNAL LOADBALANACER AND AUTOSCALING
