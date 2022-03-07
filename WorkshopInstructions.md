@@ -114,7 +114,7 @@ LEARNING OBJECTIVES:
     ```
     You should see a transmission of packets. Stop it by pressing cntrl c.
 
-    _NOTE: If you can’t reach the internet then you need to double check your route tables and subnet associations to verify if traffic is being routed to your NAT gateway!_
+_NOTE: If you can’t reach the internet then you need to double check your route tables and subnet associations to verify if traffic is being routed to your NAT gateway!_
 
 1. Test Database Connectivity
     1. Start by downloading the MySQL CLI:
@@ -313,7 +313,7 @@ INSTRUCTIONS:
     1. Under **Advances details** use the same IAM instance profile we have been using for our EC2 instances.
 
 1. Create Autoscaling Group
-    1. On the left side of the Ec2 dashboard navigate to **Auto Scaling Groups** under **Auto Scaling**.
+    1. We will now create an Auto Scaling Group for our app instances. On the left side of the Ec2 dashboard navigate to **Auto Scaling Groups** under **Auto Scaling**.
     1. After giving your group a name, select the Launch Template we just created and click next.
     1. On the **Choose instance launch options** page set your VPC, and the private instance subnets for the app tier and continue to the optional step 3.
     1. Here, we'll attach this Auto Scaling Group to the Load Balancer we just created. We do this by selecting the existing load balancer's target group from the dropdown. Then, click next.
@@ -453,7 +453,7 @@ INSTRUCTIONS:
     1. Under **Advances details** use the same IAM instance profile we have been using for our EC2 instances.
 
 1. Create Autoscaling Group
-    1. We will now create an Auto Scaling Group for our web instance. On the left side of the Ec2 dashboard navigate to **Auto Scaling Groups** under **Auto Scaling**.
+    1. We will now create an Auto Scaling Group for our web instances. On the left side of the Ec2 dashboard navigate to **Auto Scaling Groups** under **Auto Scaling**.
     1. After giving your group a name, select the Launch Template we just created and click next.
     1. On the **Choose instance launch options** page set your VPC, and the public instance subnets for the web tier and continue to the optional step 3.
     1. Here, we'll attach this Auto Scaling Group to the Load Balancer we just created. Select **Attach to an existing load balancer**.  Then, select the existing load balancer's target group from the dropdown. Click next.
