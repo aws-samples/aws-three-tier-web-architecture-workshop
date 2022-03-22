@@ -1,33 +1,41 @@
 #transactions {
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: larger;
-    border-collapse: collapse;
-    width: 100%;
-  }
-  
-  #transactions td, #transactions th {
-    border: 1px solid #ddd;
-    padding: 8px;
-  }
-  
-/* #transactions tr:nth-child(even){background-color: #6c9a3e;} */
-  
-  #transactions tr:hover {background-color:#6c9a3e;}
-  
-  #transactions th {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    text-align: left;
-    background-color: #4CAF50;
-    color: white;
-  }
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: larger;
+  border-collapse: collapse;
+  width: 100%;
+}
 
-  thead,
+#transactions td, #transactions th {
+  border: 1px solid rgb(9, 81, 187);
+  color: white;
+  padding: 8px;
+}
+
+#title {
+  color: white
+}
+
+#colHeader td{
+  color:rgb(9, 81, 187);
+}
+
+#transactions tr:nth-child(even){background-color: #0A0128;} 
+
+#transactions tr:hover {background-color:#221f2d;}
+
+#transactions th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #4CAF50;
+}
+
+thead,
 tbody {
-  display: block;
+display: block;
 }
 
 tbody {
-  height: 500px;
-  overflow: auto;
+height: 500px;
+overflow: auto;
 }
