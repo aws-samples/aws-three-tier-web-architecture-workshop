@@ -1,0 +1,85 @@
+{
+  "description": "AMI and instance configuration for the three-tier architecture",
+  "notes": [
+    "Web Tier and App Tier use Amazon Linux 2 EC2 instances.",
+    "Database Tier uses Amazon Aurora MySQL (managed RDS) — no EC2 AMI required.",
+    "AMI IDs are region-specific. Use the SSM parameter path to always resolve the latest Amazon Linux 2 AMI for your region.",
+    "SSM path (region-agnostic): /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2",
+    "Resolve via CLI: aws ssm get-parameter --name /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2 --region <YOUR_REGION> --query 'Parameter.Value' --output text"
+  ],
+  "tiers": {
+    "web_tier": {
+      "purpose": "Public-facing Nginx reverse proxy serving React SPA + forwarding /api/* to internal LB",
+      "instance_type": "t2.micro",
+      "os": "Amazon Linux 2",
+      "ami_ssm_parameter": "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2",
+      "known_amis_by_region": {
+        "us-east-1":      "ami-0c02fb55956c7d316",
+        "us-east-2":      "ami-0b0af3577fe5e3532",
+        "us-west-1":      "ami-0d9858aa3c6322f73",
+        "us-west-2":      "ami-098e42ae54c764c35",
+        "eu-west-1":      "ami-0d71ea30463e0ff49",
+        "eu-west-2":      "ami-0bd2099338bc55e6d",
+        "eu-central-1":   "ami-0a1ee2fb28fe05df3",
+        "ap-southeast-1": "ami-0c802847a501da816",
+        "ap-southeast-2": "ami-07620139298af599e",
+        "ap-northeast-1": "ami-0218d08a1f9dac831",
+        "ap-south-1":     "ami-0cca134ec43cf708f",
+        "ca-central-1":   "ami-00f881f027a6d74a0",
+        "sa-east-1":      "ami-05aa753c043f1dcd3"
+      },
+      "userdata_script": "infrastructure/web-tier-userdata.sh",
+      "ports": {
+        "inbound": [80, 443],
+        "health_check": "/health"
+      },
+      "software": ["nginx", "nodejs-16", "npm"],
+      "app_path": "/home/ec2-user/web-tier"
+    },
+    "app_tier": {
+      "purpose": "Private Node.js API server behind internal load balancer, connects to Aurora",
+      "instance_type": "t2.micro",
+      "os": "Amazon Linux 2",
+      "ami_ssm_parameter": "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2",
+      "known_amis_by_region": {
+        "us-east-1":      "ami-0c02fb55956c7d316",
+        "us-east-2":      "ami-0b0af3577fe5e3532",
+        "us-west-1":      "ami-0d9858aa3c6322f73",
+        "us-west-2":      "ami-098e42ae54c764c35",
+        "eu-west-1":      "ami-0d71ea30463e0ff49",
+        "eu-west-2":      "ami-0bd2099338bc55e6d",
+        "eu-central-1":   "ami-0a1ee2fb28fe05df3",
+        "ap-southeast-1": "ami-0c802847a501da816",
+        "ap-southeast-2": "ami-07620139298af599e",
+        "ap-northeast-1": "ami-0218d08a1f9dac831",
+        "ap-south-1":     "ami-0cca134ec43cf708f",
+        "ca-central-1":   "ami-00f881f027a6d74a0",
+        "sa-east-1":      "ami-05aa753c043f1dcd3"
+      },
+      "userdata_script": "infrastructure/app-tier-userdata.sh",
+      "ports": {
+        "inbound": [4000],
+        "health_check": "/health"
+      },
+      "software": ["nodejs-16", "npm", "pm2"],
+      "app_path": "/home/ec2-user/app-tier"
+    },
+    "database_tier": {
+      "purpose": "Amazon Aurora MySQL — fully managed, no EC2 AMI required",
+      "type": "Amazon Aurora MySQL",
+      "engine": "aurora-mysql",
+      "engine_version": "8.0",
+      "instance_class": "db.t3.micro",
+      "multi_az": true,
+      "port": 3306,
+      "note": "Aurora is provisioned via RDS console or CloudFormation. Use the cluster writer endpoint as DB_HOST in DbConfig.js.",
+      "dbconfig_file": "application-code/app-tier/DbConfig.js",
+      "required_parameters": {
+        "DB_HOST": "<aurora-cluster-writer-endpoint>",
+        "DB_USER": "<master-username>",
+        "DB_PWD":  "<master-password>",
+        "DB_DATABASE": "webappdb"
+      }
+    }
+  }
+}
